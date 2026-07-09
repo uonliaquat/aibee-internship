@@ -1,7 +1,7 @@
 #ifndef LAYER_NORM_H
 #define LAYER_NORM_H
-#include<stdio.h>
-#include<stdint.h>
+#include<stdio.h> //standard input output 
+#include<stdint.h> // integer types 
 
 void layernorm(
     const float* __restrict embed,

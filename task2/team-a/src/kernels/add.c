@@ -1,5 +1,6 @@
 #include "../../inc/kernels/add.h"
 
+// naive element by element add
 void add(
     const float* a,
     const float* b,
@@ -11,6 +12,7 @@ void add(
     }
 }
 
+// // slightly optimized version
 // void add(
 //     const float* a,
 //     const float* b,
