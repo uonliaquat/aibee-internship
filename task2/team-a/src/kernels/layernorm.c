@@ -1,4 +1,5 @@
 #include "../../inc/kernels/layernorm.h"
+#include <math.h>
 
 // LayerNorm formula: ((x - mean) / sqrt(var + eps)) * gamma + beta
 void layernorm(
@@ -10,27 +11,27 @@ void layernorm(
     size_t embed_dim,                      // embedding dimension (d)
     float eps                              // div zero prevention 
 ) {
-    const float inv_dim = 1.0f / (float)embed_dim;
-
     for (size_t i = 0; i < seq_len; i++) {
         const float* __restrict token = embed + i * embed_dim;
         float* __restrict output_token = y + i * embed_dim;
 
-        float sum = 0.0f;
+        double sum = 0.0;
         for (size_t j = 0; j < embed_dim; j++) {
-            sum += token[j];
+            sum += (double)token[j];
         }
-        float mean = sum * inv_dim;
+        double mean = sum / (double)embed_dim;
 
-        float var = 0.0f;
+        double var = 0.0;
         for (size_t j = 0; j < embed_dim; j++) {
-            float diff = token[j] - mean;
-            var = fmaf(diff, diff, var); // fused multiplication additive (a*b + c) in 1 clock
+            double diff = (double)token[j] - mean;
+            var += diff * diff;
         }
-        float inv_std = 1.0f / sqrtf(fmaf(var, inv_dim, eps));
+        var /= (double)embed_dim;
+
+        double inv_std = 1.0 / sqrt(var + (double)eps);
 
         for (size_t j = 0; j < embed_dim; j++) {
-            float norm = (token[j] - mean) * inv_std;
+            float norm = (float)(((double)token[j] - mean) * inv_std);
             output_token[j] = fmaf(norm, weight[j], bias[j]);
         }
     }
