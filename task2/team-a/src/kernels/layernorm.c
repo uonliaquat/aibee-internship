@@ -15,18 +15,20 @@ void layernorm(
         const float* __restrict token = embed + i * embed_dim;
         float* __restrict output_token = y + i * embed_dim;
 
+        double inv = 1.0 / (double)embed_dim;
+
         double sum = 0.0;
         for (size_t j = 0; j < embed_dim; j++) {
             sum += (double)token[j];
         }
-        double mean = sum / (double)embed_dim;
+        double mean = sum * inv;
 
         double var = 0.0;
         for (size_t j = 0; j < embed_dim; j++) {
             double diff = (double)token[j] - mean;
             var += diff * diff;
         }
-        var /= (double)embed_dim;
+        var = var * inv;
 
         double inv_std = 1.0 / sqrt(var + (double)eps);
 
