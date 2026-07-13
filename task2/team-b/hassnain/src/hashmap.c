@@ -1,15 +1,15 @@
-#include "hashmap.h"
+#include "../include/hashmap.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
 
-static unsigned long hash_function(const char* str) {
-    unsigned long hash = 1469598103934665603UL;  
+static unsigned long long hash_function(const char* str) {
+    unsigned long long hash = 1469598103934665603ULL;  
     
     while (*str) {
         hash ^= (unsigned char)(*str);
-        hash *= 1099511628211UL;  
+        hash *= 1099511628211ULL;  
         str++;
     }
     
@@ -108,7 +108,7 @@ void hash_map_destroy(HashMap* map) {
     free(map->buckets);
     free(map);
 }
-void hash_map_insert(HashMap* map,const char* key,int valeu)
+void hash_map_insert(HashMap* map,const char* key,int value)
 {
     if(!map||!key){
         return;
@@ -121,7 +121,7 @@ void hash_map_insert(HashMap* map,const char* key,int valeu)
     HashNode* current = map->buckets[index];
     while(current){
         if(strcmp(current->key,key)==0){
-            current->value = valeu;
+            current->value = value;
             map->version++;
             return;
         }
@@ -139,7 +139,7 @@ void hash_map_insert(HashMap* map,const char* key,int valeu)
        return;
    }
    new_node->key = key_copy;
-   new_node-> value = valeu;
+   new_node-> value = value;
    new_node->next = map->buckets[index];
    map->buckets[index] = new_node;
    map->size++;
@@ -161,10 +161,6 @@ bool hash_map_get(const HashMap* map,const char* key ,int* out_value){
     }
     return false;
 }
-bool hash_map_contains(const HashMap* map,const char* key){
-    int dummy;
-    return hash_map_get(map,key,&dummy);
-}
 size_t hash_map_size(const HashMap* map)
 {
     return map ? map->size:0;
@@ -184,6 +180,10 @@ void hash_map_clear(HashMap* map){
     }
     map->size = 0;
     map->version++;
+}
+bool hash_map_contains(const HashMap* map,const char* key){
+    int dummy;
+    return hash_map_get(map,key,&dummy);
 }
 void hash_map_print_stats(const HashMap* map) {
     if (!map) {
@@ -239,4 +239,7 @@ const char* hash_map_get_key(HashNode* node) {
 
 int hash_map_get_value(HashNode* node) {
     return node ? node->value : -1;
+}
+size_t hash_map_get_size(const HashMap* map) {
+    return map ? map->size : 0;
 }
