@@ -51,4 +51,16 @@ void linear(
         &C
     );
 
+    // creating the scalar objects for alpha and beta because the gemm function does not accept C floats
+    obj_t Alpha,Beta;
+    bli_obj_create_1x1(BLIS_FLOAT,&Alpha);
+    bli_obj_create_1x1(BLIS_FLOAT,&Beta);
+    bli_setsc(alpha,0.0f,&Alpha); // the 0.0f is the imaginary part
+    bli_setsc(beta,0.0f,&Beta);
+
+    //C = alpha * A * B + beta * C
+    bli_gemm(&Alpha,&A,&B,&Beta,&C);
+
+
+
 };
