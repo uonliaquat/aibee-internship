@@ -12,6 +12,7 @@ output_features: no. of columns in W, length of b
 
 x is input matrix, [rows * input_features]
 W is the weight matrix, [input_features * output_features]
+out is the resultant matrix, [rows * output_features]
 b is the bias, the length of this vector is equal to the output_features
 
 Memory layout: (row major)
@@ -29,7 +30,7 @@ void linear(
     size_t rows,
     size_t input_features,
     size_t output_features,
-    bool transpose
+    bool transpose_W
 );
 
 #endif
