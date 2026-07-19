@@ -13,19 +13,7 @@ void linear(
 ){
     //BLIS gemm formula is C = beta*C + alpha*A*B
     float alpha=1.0f;
-    float beta;
-
-    // Beta trick: pre-fill output with bias, then let BLIS keep it via beta=1.0
-    if (b != NULL) {
-        for (size_t i = 0; i < rows; i++)
-            memcpy(output + i * output_features, b, output_features * sizeof(float));
-        beta = 1.0f;   // C = A*B + 1.0*C → preserves bias
-    } else {
-        beta = 0.0f;   // C = A*B + 0.0*C → ignores C
-    }
-
-    // ... rest stays exactly the same (A, B, C objects, bli_gemm) ...
-
+    float beta=0.0f;
     // BLIS object for A, stores the metadata describing the x matrix
     obj_t A;
     bli_obj_create_with_attached_buffer(
@@ -73,6 +61,15 @@ void linear(
     //C = alpha * A * B + beta * C
     bli_gemm(&Alpha,&A,&B,&Beta,&C);
 
+    // adds bias to every row
+    if (b != NULL) {
+        for (size_t i = 0; i < rows; i++) {
+            float* row = output + i * output_features;
+            for (size_t j = 0; j < output_features; j++) {
+                row[j] += b[j];
+            }
+        }
+    }
 }
 
 
