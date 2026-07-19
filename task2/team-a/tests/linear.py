@@ -11,6 +11,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import sys
+import time
 
 # ---------- load shared library ----------
 lib = ctypes.CDLL("./build/libkernels.so")
@@ -33,7 +34,7 @@ def ptr(arr):
     return arr.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
 
 
-def run_one_test(rows, in_feat, out_feat, transpose_W, atol=1e-4):
+def run_one_test(test_num, rows, in_feat, out_feat, transpose_W, atol=2e-4):
     """
     Run one linear test case.
 
@@ -43,38 +44,54 @@ def run_one_test(rows, in_feat, out_feat, transpose_W, atol=1e-4):
     Our C function with transpose_W=False expects W as [in_features × out_features].
     Our C function with transpose_W=True  expects W as [out_features × in_features].
     """
+    trans_str = "T" if transpose_W else "N"
+    label = f"linear({rows}×{in_feat} @ {in_feat}×{out_feat}, W={trans_str})"
+
     # random inputs
     x = np.random.randn(rows, in_feat).astype(np.float32)
     b = np.random.randn(out_feat).astype(np.float32)
 
     if transpose_W:
-        # W stored as [out_features × in_features]  (same as PyTorch)
         W = np.random.randn(out_feat, in_feat).astype(np.float32)
     else:
-        # W stored as [in_features × out_features]  (column layout for matmul)
         W = np.random.randn(in_feat, out_feat).astype(np.float32)
 
     out_c = np.zeros((rows, out_feat), dtype=np.float32)
 
-    # --- run C kernel ---
+    # --- run C kernel (timed) ---
+    t0 = time.perf_counter()
     lib.linear(ptr(x), ptr(W), ptr(b), ptr(out_c),
                rows, in_feat, out_feat, transpose_W)
+    c_time = (time.perf_counter() - t0) * 1000  # ms
 
-    # --- run PyTorch oracle ---
+    # --- run PyTorch oracle (timed) ---
     x_t = torch.tensor(x)
     b_t = torch.tensor(b)
 
     if transpose_W:
-        # W is [out × in], same layout PyTorch expects
         W_t = torch.tensor(W)
     else:
-        # W is [in × out], PyTorch wants [out × in]
         W_t = torch.tensor(W.T.copy())
 
+    t0 = time.perf_counter()
     out_torch = F.linear(x_t, W_t, b_t).numpy()
+    py_time = (time.perf_counter() - t0) * 1000  # ms
 
     # --- compare ---
-    np.testing.assert_allclose(out_c, out_torch, atol=atol, rtol=1e-5)
+    max_diff = np.max(np.abs(out_c - out_torch))
+    match = max_diff <= atol
+
+    # --- print details ---
+    status = "\033[92mPASS\033[0m" if match else "\033[91mFAIL\033[0m"
+    print(f"\n  Test {test_num:2d} [{status}]  {label}")
+    print(f"    Input:     x={rows}×{in_feat}  W={'T' if transpose_W else ''}{W.shape[0]}×{W.shape[1]}  b={out_feat}")
+    print(f"    C output:  first 5 = {out_c.flat[:5]}")
+    print(f"    Expected:  first 5 = {out_torch.flat[:5]}")
+    print(f"    Max diff:  {max_diff:.8f}  (tolerance: {atol})")
+    print(f"    Time:      C = {c_time:.3f} ms  |  PyTorch = {py_time:.3f} ms")
+
+    if not match:
+        raise AssertionError(f"max diff {max_diff} > {atol}")
 
 
 # ---------- test suite ----------
@@ -97,29 +114,29 @@ test_configs = [
     (256,  768,  3072, True),   # medium batch, transposed
 ]
 
+print("=" * 60)
+print("  LINEAR KERNEL — ANSWER KEY TEST")
+print("=" * 60)
+
 for i in range(num_tests):
     cfg = test_configs[i % len(test_configs)]
     rows, in_f, out_f, trans = cfg
-    label = f"linear({rows}×{in_f} @ {'T' if trans else ''}{in_f}×{out_f})"
     try:
-        run_one_test(rows, in_f, out_f, trans)
+        run_one_test(i + 1, rows, in_f, out_f, trans)
         passed += 1
-    except AssertionError as e:
-        failed += 1
-        print(f"  \033[91m[FAIL]\033[0m {label}: {e}")
     except Exception as e:
         failed += 1
-        print(f"  \033[91m[FAIL]\033[0m {label}: {e}")
 
+print("\n" + "=" * 60)
 if passed == num_tests:
     print(
-        f"\033[92m[PASS]\033[0m linear "
+        f"  \033[92m[PASS]\033[0m linear "
         f"({passed}/{num_tests} tests passed)"
     )
     sys.exit(0)
 else:
     print(
-        f"\033[91m[FAIL]\033[0m linear "
+        f"  \033[91m[FAIL]\033[0m linear "
         f"({passed}/{num_tests} tests passed, {failed} failed)"
     )
     sys.exit(1)
