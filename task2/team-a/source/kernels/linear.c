@@ -61,6 +61,15 @@ void linear(
     //C = alpha * A * B + beta * C
     bli_gemm(&Alpha,&A,&B,&Beta,&C);
 
+    // adds bias to every row
+    if (b != NULL) {
+        for (size_t i = 0; i < rows; i++) {
+            float* row = output + i * output_features;
+            for (size_t j = 0; j < output_features; j++) {
+                row[j] += b[j];
+            }
+        }
+    }
+}
 
 
-};
