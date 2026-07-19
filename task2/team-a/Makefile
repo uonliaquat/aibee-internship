@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -O3 -Wall -Wextra -fPIC -I./inc -I/usr/include/blis
+CFLAGS = -O3 -Wall -Wextra -fPIC -I./include -I/usr/include/blis
 LDFLAGS = -shared -lm -lblis
 
-SRC_DIR = src/kernels
+SRC_DIR = source/kernels
 BUILD_DIR = build
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
