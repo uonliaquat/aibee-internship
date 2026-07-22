@@ -5,7 +5,20 @@ CFLAGS = -O2 -fPIC
 INCLUDES = -Iinc -I/usr/local/include/blis
 LDFLAGS = -L/usr/local/lib -lblis -lpthread -lm
 
-SRC = src/linear_nobias.c
+SRC = \
+src/linear_nobias.c \
+src/rope.c
+
+
+# SRC = \
+# src/linear_nobias.c \
+# src/rope.c \
+# src/silu.c \
+# src/mul.c \
+# src/rmsnorm.c \
+# src/swiglu.c
+
+
 BUILD_DIR = build
 TARGET = $(BUILD_DIR)/libkernels.so
 
