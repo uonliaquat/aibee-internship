@@ -1,10 +1,6 @@
 #include "rope.h"
 
-static void rotate_half(
-    const float *x,
-    float *out,
-    size_t dim
-)
+static void rotate_half( const float *x, float *out, size_t dim)
 {
     size_t half = dim / 2;
 
@@ -20,14 +16,7 @@ static void rotate_half(
 }
 
 
-void kernel_rope_cpu_f32_forward(
-    float *q,
-    float *k,
-    const float *cos,
-    const float *sin,
-    size_t seq_len,
-    size_t head_dim
-)
+void kernel_rope_cpu_f32_forward( float *q, float *k, const float *cos, const float *sin, size_t seq_len, size_t head_dim)
 {
     size_t row;
 

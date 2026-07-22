@@ -7,16 +7,10 @@ LDFLAGS = -L/usr/local/lib -lblis -lpthread -lm
 
 SRC = \
 src/linear_nobias.c \
-src/rope.c
-
-
-# SRC = \
-# src/linear_nobias.c \
-# src/rope.c \
-# src/silu.c \
-# src/mul.c \
-# src/rmsnorm.c \
-# src/swiglu.c
+src/rope.c \
+src/silu.c \
+src/mul.c \
+src/swiglu.c
 
 
 BUILD_DIR = build
@@ -34,6 +28,8 @@ $(TARGET): $(SRC)
 # Build (if needed) and run the Python test
 test: $(TARGET)
 	python3 test/test_linear_nobias.py
+	python3 test/test_rope.py
+	python3 test/test_swiglu.py
 
 # Remove build artifacts
 clean:
