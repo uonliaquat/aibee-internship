@@ -1,4 +1,3 @@
-````markdown
 # Multi-Head Attention
 
 ## Build (Debug)
@@ -55,7 +54,4 @@ project/
 ├── blis/
 └── Readme.md
 
-```
-
-```
 ```
