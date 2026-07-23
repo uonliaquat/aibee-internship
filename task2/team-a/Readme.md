@@ -26,21 +26,21 @@ cmake ..
 make
 ```
 
-### Create Python Virtual Environment
+### 2) Create Python Virtual Environment
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-### Install Python Dependencies
+### 3) Install Python Dependencies
 
 ```bash
 pip install numpy torch
 ```
 
 
-### Run Python Test
+### 4) Run Python Test
 
 ```bash
 python3 test/test_attention.py
