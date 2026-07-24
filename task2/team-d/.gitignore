@@ -6,4 +6,3 @@ tl.gguf
 *.o
 *.so
 *.out
-loader
