@@ -40,13 +40,17 @@ make clean
 ### 2. Individual Tensor Testing
 
 To run the compiled C loader directly on a target tensor:
+
 ./loader tl.gguf token_embd.weight
 
 To run the Python oracle test verification on an individual tensor:
+
 python3 UnitTests/LOT.py tl.gguf token_embd.weight
 
 ### 3. Full Test Suite Execution
 
 To execute the automated test script across all model tensors:
+
 chmod +x UnitTests/test_all.sh
+
 ./UnitTests/test_all.sh tl.gguf
