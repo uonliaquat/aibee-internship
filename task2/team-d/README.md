@@ -54,3 +54,8 @@ To execute the automated test script across all model tensors:
 chmod +x UnitTests/test_all.sh
 
 ./UnitTests/test_all.sh tl.gguf
+
+
+# GGUF File Structure 
+
+https://miro.com/app/board/uXjVH4NRdF8=/?share_link_id=711639388790
