@@ -6,6 +6,7 @@ import time
 
 lib = ctypes.CDLL("../build/libattention.so")
 
+
 lib.attention.argtypes = [
     ctypes.POINTER(ctypes.c_float),   # q
     ctypes.POINTER(ctypes.c_float),   # k
@@ -39,25 +40,24 @@ def attention_python(q, k, v, heads):
         vh = torch.tensor(v[:, cols])
 
         scores = (qh @ kh.T) / math.sqrt(head_dim)
-
         mask = torch.triu(
             torch.ones(ctx, ctx),
             diagonal=1
         ).bool()
 
-        scores = scores.masked_fill(mask, float(0))
+        scores = scores.masked_fill(mask, -float('inf'))
 
         probs = torch.softmax(scores, dim=-1)
 
-        output[:, cols] = (scores @ vh).numpy()
+        output[:, cols] = (probs @ vh).numpy()
 
     return output
 
 
 
-ctx = 8
-embed = 16
-heads = 4
+ctx = 1024
+embed = 768
+heads = 12
 
 head_dim = embed // heads
 
@@ -98,16 +98,16 @@ p_out = attention_python(q, k, v, heads)
 te_p = time.perf_counter()
 
 
-print("C OUTPUT\n")
-print(c_out)
-
-print("PYTORCH\n")
-print(p_out)
+# print("C OUTPUT\n")
+# print(c_out)
+#
+# print("PYTORCH\n")
+# print(p_out)
 
 diff = np.abs(c_out - p_out)
 
 
-print("\nMax Error :", diff.max())
+# print("\nMax Error :", diff.max())
 
 try:
 
@@ -123,7 +123,7 @@ try:
 except AssertionError as e:
 
     print("\nFAIL")
-    print(e)
+    # print(e)
 
 print("\nC Time       :", (te_c - ts_c) * 1000, "ms")
 print("PyTorch Time :", (te_p - ts_p) * 1000, "ms")
