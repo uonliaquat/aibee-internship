@@ -55,6 +55,11 @@ chmod +x UnitTests/test_all.sh
 
 ./UnitTests/test_all.sh tl.gguf
 
+### 4. For Header and MetaData only 
+
+./loader tl.gguf
+
+
 
 # GGUF File Structure 
 
