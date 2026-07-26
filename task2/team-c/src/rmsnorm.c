@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-void rmsnorm(
+void kernel_rmsnorm_cpu_f32_forward(
     const double* __restrict embed,         // embeddings
     const double* __restrict weight,        // gamma
     double* __restrict y,                   // output

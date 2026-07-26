@@ -6,9 +6,9 @@ import sys
 import platform
 
 _EXT = {"Darwin": ".dylib", "Linux": ".so", "Windows": ".dll"}
-lib = ctypes.CDLL(f"../../build/libkernels{_EXT[platform.system()]}")
+lib = ctypes.CDLL(f"build/libkernels{_EXT[platform.system()]}")
 
-lib.rmsnorm.argtypes = [
+lib.kernel_rmsnorm_cpu_f32_forward.argtypes = [
     ctypes.POINTER(ctypes.c_double),
     ctypes.POINTER(ctypes.c_double),
     ctypes.POINTER(ctypes.c_double),
@@ -16,7 +16,7 @@ lib.rmsnorm.argtypes = [
     ctypes.c_size_t,
     ctypes.c_double
 ]
-lib.rmsnorm.restype = None
+lib.kernel_rmsnorm_cpu_f32_forward.restype = None
 
 num_tests = 100
 passed = 0
@@ -37,7 +37,7 @@ for test_idx in range(num_tests):
 
     out = np.zeros(seq_len * embed_dim, dtype=np.float64)
 
-    lib.rmsnorm(
+    lib.kernel_rmsnorm_cpu_f32_forward(
         embeddings.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
         weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
         out.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),

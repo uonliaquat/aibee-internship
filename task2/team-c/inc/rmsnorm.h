@@ -3,7 +3,7 @@
 #include<stdio.h>
 #include<stdint.h>
 
-void rmsnorm(
+void kernel_rmsnorm_cpu_f32_forward(
     const double* __restrict embed,
     const double* __restrict weight,
     double* __restrict y,

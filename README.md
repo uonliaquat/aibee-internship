@@ -8,10 +8,10 @@ The rules on this page are permanent — they apply to every task.
 
 | Team | Members (lead first) | Focus |
 |---|---|---|
-| A | Muhammad Ahmad, M. Waize, Ibrahim Butt, Hamza Abbas | kernels / low-level |
+| A | Muhammad Ahmad, M. Waize, Ibrahim Butt, Hamza Abbas ,Areej Sheikh| kernels / low-level |
 | B | Hassnain Javaid, Ayesha Noor, Toheed Ali, Zunair Khalid | tokenizer |
 | C | Hanan CH, Shajia Siddiqa, Kiren Saleem, Jazim Iqbal | LLaMA kernels |
-| D | Rana Hammad, M Moiz Ur Rehman, Abdullah Nawaz | file formats / GGUF |
+| D | Rana Hammad, M Moiz Ur Rehman, Abdullah Nawaz,Tala Zaman,Umar Ahad Usmani | file formats / GGUF |
 
 ## The one rule that matters: the "answer key" test
 
