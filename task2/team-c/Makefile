@@ -17,7 +17,7 @@ src/rmsnorm.c
 BUILD_DIR = build
 TARGET = $(BUILD_DIR)/libkernels.so
 
-.PHONY: all test clean
+.PHONY: all test output clean
 
 # Default target: build the shared library
 all: $(TARGET)
@@ -32,7 +32,14 @@ test: $(TARGET)
 	python3 test/test_linear_nobias.py
 	python3 test/test_rope.py
 	python3 test/test_swiglu.py
-	python3 test/rmsnorm.py
+	python3 test/test_rmsnorm.py
+
+output: $(TARGET)
+	python3 test/test_linear_nobias_real.py
+	python3 test/test_rmsnorm_real.py
+	python3 test/test_silu_real.py
+	python3 test/test_mul_real.py
+	python3 test/test_rope_real.py
 
 # Remove build artifacts
 clean:

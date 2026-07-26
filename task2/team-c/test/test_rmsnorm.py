@@ -9,12 +9,12 @@ _EXT = {"Darwin": ".dylib", "Linux": ".so", "Windows": ".dll"}
 lib = ctypes.CDLL(f"build/libkernels{_EXT[platform.system()]}")
 
 lib.kernel_rmsnorm_cpu_f32_forward.argtypes = [
-    ctypes.POINTER(ctypes.c_double),
-    ctypes.POINTER(ctypes.c_double),
-    ctypes.POINTER(ctypes.c_double),
+    ctypes.POINTER(ctypes.c_float),
+    ctypes.POINTER(ctypes.c_float),
+    ctypes.POINTER(ctypes.c_float),
     ctypes.c_size_t,
     ctypes.c_size_t,
-    ctypes.c_double
+    ctypes.c_float
 ]
 lib.kernel_rmsnorm_cpu_f32_forward.restype = None
 
@@ -27,20 +27,20 @@ for test_idx in range(num_tests):
     seq_len = np.random.randint(1, 512)
     eps = 1e-5
 
-    embeddings = np.random.randn(seq_len, embed_dim).astype(np.float64)
-    weights = np.random.randn(embed_dim).astype(np.float64)
+    embeddings = np.random.randn(seq_len, embed_dim).astype(np.float32)
+    weights = np.random.randn(embed_dim).astype(np.float32)
 
     if test_idx % 3 == 0:
         embeddings *= 100.0
     elif test_idx % 3 == 1:
         embeddings *= 0.01
 
-    out = np.zeros(seq_len * embed_dim, dtype=np.float64)
+    out = np.zeros(seq_len * embed_dim, dtype=np.float32)
 
     lib.kernel_rmsnorm_cpu_f32_forward(
-        embeddings.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
-        weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
-        out.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+        embeddings.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+        weights.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+        out.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
         seq_len,
         embed_dim,
         eps
@@ -49,8 +49,8 @@ for test_idx in range(num_tests):
     out_reshaped = out.reshape(seq_len, embed_dim)
 
     try:
-        x_torch = torch.tensor(embeddings, dtype=torch.float64)
-        w_torch = torch.tensor(weights, dtype=torch.float64)
+        x_torch = torch.tensor(embeddings, dtype=torch.float32)
+        w_torch = torch.tensor(weights, dtype=torch.float32)
         rms_norm = nn.RMSNorm(
             normalized_shape=x_torch.shape[-1],
             eps=eps,

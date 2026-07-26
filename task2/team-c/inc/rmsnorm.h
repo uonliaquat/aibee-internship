@@ -4,12 +4,12 @@
 #include<stdint.h>
 
 void kernel_rmsnorm_cpu_f32_forward(
-    const double* __restrict embed,
-    const double* __restrict weight,
-    double* __restrict y,
+    const float* __restrict embed,
+    const float* __restrict weight,
+    float* __restrict y,
     const size_t seq_len,
     const size_t embed_dim,
-    const double eps
+    const float eps
 );
 
 #endif
