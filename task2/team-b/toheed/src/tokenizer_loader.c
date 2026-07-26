@@ -197,71 +197,82 @@ static HashMap* load_vocab_json(const char* filename)
 
 static MergeTable* load_merges_txt(const char* filename)
 {
-    printf("Loading merges from:%s\n",filename);
+    printf("Loading merges from:%s\n", filename);
 
     char* file_data = read_file_contents(filename);
-    if(!file_data)
+    if (!file_data)
     {
         return NULL;
     }
+
     MergeTable* merges = merge_table_create(1000);
-    if(!merges)
+    if (!merges)
     {
         free(file_data);
         return NULL;
     }
+
     const char* ptr = file_data;
     char line[512];
     int line_number = 0;
-    
-    while(*ptr)
+
+    while (*ptr)
     {
         const char* line_start = ptr;
-        while(*ptr && *ptr != '\n')
+
+        while (*ptr && *ptr != '\n')
         {
             ptr++;
         }
+
         size_t line_len = ptr - line_start;
-        if(line_len > 0 && line_len<sizeof(line)-1)
+
+        if (line_len > 0 && line_len < sizeof(line))
         {
-            memcpy(line,line_start,line_len);
+            memcpy(line, line_start, line_len);
             line[line_len] = '\0';
-            if(line_len > 0 && line[line_len-1]=='\r')
+
+            if (line_len > 0 && line[line_len - 1] == '\r')
             {
                 line[line_len - 1] = '\0';
             }
-            if(line[0]!= '\0' && line[0]!= '#')
+
+            if (strncmp(line, "#version:", 9) != 0 && line[0] != '\0')
             {
                 char* token1 = line;
-                char* token2 = strchr(line,' ');
-                if(token2)
+                char* token2 = strchr(line, ' ');
+
+                if (token2)
                 {
                     *token2 = '\0';
                     token2++;
 
-                    while(*token2 == ' ')
+                    while (*token2 == ' ')
                     {
                         token2++;
                     }
-                    if(*token2!='\0')
+
+                    if (*token2 != '\0')
                     {
-                        int rank = line_number-1;
-                        if(line[0]!='#')
-                        {
-                            merge_table_add_rule(merges,token1,token2,rank);
-                        }
+                        int rank = line_number - 1;
+                        merge_table_add_rule(merges, token1, token2, rank);
                     }
                 }
             }
         }
-        if(*ptr == '\n')
+
+        if (*ptr == '\n')
         {
             ptr++;
         }
+
         line_number++;
     }
+
     free(file_data);
-    printf("Loaded %zu merge rules\n",merge_table_size(merges));
+
+    printf("Loaded %zu merge rules\n", merge_table_size(merges));
+
     return merges;
 }
 static char** build_inverse_vocab(HashMap* vocab,size_t* out_vocab_size)
@@ -340,6 +351,7 @@ TokenizerData* tokenizer_init(const char* vocab_path,const char* merges_path)
     if(!data->merges)
     {
         fprintf(stderr,"Error: Failed to laod merge rules\n");
+        hash_map_destroy(data->vocab);
         free(data);
         return NULL;
     }

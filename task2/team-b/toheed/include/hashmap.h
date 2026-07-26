@@ -12,7 +12,7 @@ void hash_map_destroy(HashMap* map);
 void hash_map_insert(HashMap* map,const char* key,int val);
 bool hash_map_get(const HashMap* map,const char* key,int* out_valeu);
 bool hash_map_get_string(const HashMap* map,int key ,const char** out_valeu);
-void hash_map_remove(const HashMap* map,const char*);
+void hash_map_remove(HashMap* map,const char*);
 size_t hash_map_size(const HashMap* map);
 void hash_map_clear(HashMap* map);
 bool hash_map_contains(const HashMap* map,const char* key);

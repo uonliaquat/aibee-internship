@@ -114,7 +114,9 @@ void hash_map_insert(HashMap* map,const char* key,int value)
         return;
     }
     if(should_resize(map)){
-        resize_map(map);
+        if(!resize_map(map)){
+            fprintf(stderr,"Warning: Failed to resize hash map, performance may degrade\n");
+        }
     }
     size_t index = get_bucket_index(map,key);
 
@@ -242,4 +244,50 @@ int hash_map_get_value(HashNode* node) {
 }
 size_t hash_map_get_size(const HashMap* map) {
     return map ? map->size : 0;
+}
+
+bool hash_map_get_string(const HashMap* map, int key, const char** out_value) {
+    if (!map || !out_value) {
+        return false;
+    }
+    
+    for (size_t i = 0; i < map->capacity; i++) {
+        HashNode* current = map->buckets[i];
+        while (current) {
+            if (current->value == key) {
+                *out_value = current->key;
+                return true;
+            }
+            current = current->next;
+        }
+    }
+    
+    return false;
+}
+
+void hash_map_remove(HashMap* map, const char* key) {
+    if (!map || !key) {
+        return;
+    }
+    
+    size_t index = get_bucket_index(map, key);
+    HashNode* current = map->buckets[index];
+    HashNode* prev = NULL;
+    
+    while (current) {
+        if (strcmp(current->key, key) == 0) {
+            if (prev) {
+                prev->next = current->next;
+            } else {
+                map->buckets[index] = current->next;
+            }
+            free(current->key);
+            free(current);
+            map->size--;
+            map->version++;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
 }
